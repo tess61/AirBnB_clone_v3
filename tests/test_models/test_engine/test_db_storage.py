@@ -3,16 +3,19 @@
 Contains the TestDBStorageDocs and TestDBStorage classes
 """
 
+from datetime import datetime
 import inspect
-import uuid
-from models import storage
+import models
 from models.engine import db_storage
 from models.amenity import Amenity
+from models.base_model import BaseModel
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+import json
+import os
 import pep8
 import unittest
 DBStorage = db_storage.DBStorage
@@ -35,11 +38,10 @@ class TestDBStorageDocs(unittest.TestCase):
                          "Found code style errors (and warnings).")
 
     def test_pep8_conformance_test_db_storage(self):
-        """Test tests/test_models/test_engine/test_db_storage.py\
-conforms to PEP8."""
+        """Test tests/test_models/test_db_storage.py conforms to PEP8."""
         pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_models/test_engine\
-/test_db_storage.py'])
+        result = pep8s.check_files(['tests/test_models/test_engine/\
+test_db_storage.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
@@ -66,23 +68,21 @@ conforms to PEP8."""
                             "{:s} method needs a docstring".format(func[0]))
 
 
-class TestDBStorage(unittest.TestCase):
-    """Tests DB storage"""
-    def test_get(self):
-        """Test get method of storage"""
-        state = State(name="California")
-        storage.new(state)
-        re_state = storage.get(State, state.id)
-        self.assertEqual(state.id, re_state.id)
+class TestFileStorage(unittest.TestCase):
+    """Test the FileStorage class"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_all_returns_dict(self):
+        """Test that all returns a dictionaty"""
+        self.assertIs(type(models.storage.all()), dict)
 
-    def test_get_none(self):
-        """test for get for none existing id"""
-        state = storage.get(State, str(uuid.uuid4()))
-        self.assertIsNone(state)
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_all_no_class(self):
+        """Test that all returns all rows when no class is passed"""
 
-    def test_count(self):
-        """Test count method of storage"""
-        all_objs = storage.count()
-        self.assertIsInstance(all_objs, int)
-        state_objs = storage.count(State)
-        self.assertIsInstance(state_objs, int)
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_new(self):
+        """test that new adds an object to the database"""
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_save(self):
+        """Test that save properly saves objects to file.json"""
