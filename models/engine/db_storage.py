@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 """
 Contains the class DBStorage
 """
@@ -51,17 +51,6 @@ class DBStorage:
                     new_dict[key] = obj
         return (new_dict)
 
-    def get(self, cls, id):
-        """retrieves an object of a class with id"""
-        obj = None
-        if cls is not None and issubclass(cls, BaseModel):
-            obj = self.__session.query(cls).filter(cls.id == id).first()
-        return obj
-
-    def count(self, cls=None):
-        """retrieves the number of objects of a class or all (if cls==None)"""
-        return len(self.all(cls))
-
     def new(self, obj):
         """add the object to the current database session"""
         self.__session.add(obj)
@@ -85,3 +74,19 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+        
+    def get(self, cls, id):
+        """Get method to retrieve one object"""
+        if type(cls) is str:
+            cls = classes.get(cls)
+        if cls is None:
+            return None
+        return self.__session.query(cls).filter(cls.id == id).first()
+            
+    def count(self, cls=None):
+        """method to count the number of objects in storage"""
+        if type(cls) is str:
+            cls = classes.get(cls)
+        if cls is None:
+            return len(self.all())
+        return len(self.all(cls))
