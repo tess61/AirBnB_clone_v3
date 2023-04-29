@@ -52,17 +52,15 @@ class DBStorage:
         return (new_dict)
 
     def get(self, cls, id):
-        """retrieves one object with specified class and id"""
-        return self.__session.query(cls).filter(cls.id == id).first()
+        """retrieves an object of a class with id"""
+        obj = None
+        if cls is not None and issubclass(cls, BaseModel):
+            obj = self.__session.query(cls).filter(cls.id == id).first()
+        return obj
 
     def count(self, cls=None):
-        """count the number of objects in storage"""
-        if cls is not None:
-            return self.__session.query(cls).count()
-        count = 0
-        for clss in classes:
-            count += self.__session.query(classes[clss]).count()
-        return count
+        """retrieves the number of objects of a class or all (if cls==None)"""
+        return len(self.all(cls))
 
     def new(self, obj):
         """add the object to the current database session"""
